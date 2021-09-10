@@ -1,0 +1,18 @@
+cd C:\copy\node\pinterest;git status;git add .;git commit -m "Version 1.0";git push origin 
+
+
+cd C:\copy\node\pinterest
+
+git status
+
+git add .
+
+git commit -m "Version 1.0"
+
+git push origin 
+
+Kuvshinchik
+
+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
+
+git clone https://github.com/Kuvshinchik/pinterest.git
