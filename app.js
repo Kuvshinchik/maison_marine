@@ -4,7 +4,7 @@
 
 const path = require('path');
 const fs = require("fs");
-let pahtParametrCikl = path.join(__dirname.replace("\\yarmarka", '').replace("/yarmarka", ''));
+let pahtParametrCikl = path.join(__dirname.replace("\\pinterest", '').replace("/pinterest", ''));
 pahtParametrCikl = `${pahtParametrCikl}/parametr/1.txt`;
 let massivParametrCikl = fs.readFileSync(pahtParametrCikl, 'utf8').trim().split(':::');
 let start = massivParametrCikl[0];
