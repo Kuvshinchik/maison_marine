@@ -117,35 +117,7 @@ async function scroll_for_last_selector(driver, massiv_webElement_00) {
 }
 module.exports.scroll_for_last_selector = scroll_for_last_selector;
 
-//функция входа с вызовом формы ЛОГИН_ПАРОЛЬ
-async function pin_vhod(driver, email_pin, parole_pin) {
-    // await driver.manage().setTimeouts( { implicit: 10000 } );
-        const {Builder, By, Key, until} =  require('selenium-webdriver');
-        await driver.get('https://www.pinterest.ru/');
-        let random_seconds = randomInteger(5,6)*1000;
-        sleep(random_seconds);
-        let findElements_massiv = await driver.findElements(By.css("[data-test-id='simple-login-button'] button"));
-        if(!!findElements_massiv.length){
-         random_seconds = randomInteger(3,4)*1000;
-         await driver.findElement(By.css("[data-test-id]>button")).click();
-         sleep(random_seconds);
-         findElements_massiv = await driver.findElements(By.css('input[id="email"]'));
-         if(!!findElements_massiv.length){
-         await driver.findElement(By.css('input[id="email"]')).sendKeys(email_pin);
-         sleep(random_seconds);
-        await driver.findElement(By.css('input[id="password"]')).sendKeys(parole_pin);
-         sleep(random_seconds);
-         await driver.findElement(By.css("[data-test-id = 'registerFormSubmitButton']>button")).click();         
-         sleep(random_seconds);
-         findElements_massiv = await driver.findElements(By.css('span[id="email-error"]'));
-         sleep(random_seconds);
-         if(!!findElements_massiv.length){
-             await trevoga(driver);
-         }else{console.log('Вход через форму ЛОГИН_ПАРОЛЬ прошел успешно')}
-        }else{console.log('Не вижу форму ЛОГИН_ПАРОЛЬ')}         
-     }else{console.log('Не вижу кнопку войти')}
-  };
- module.exports.pin_vhod = pin_vhod;
+
 
 //открыть файл и создать объект
 async function ObjectMakeFromJison(number_accaunt) {

@@ -1,89 +1,36 @@
-//это сценарий поиска на Ярмарке через ключевые слова
+//это сценарий заход на Пинтерест через сохраненный браузер с прокси
+
 
 async function pinterestPerepost(numberInKatalog) {
-    try {
-
-        const { Builder, By, Key, until } = require('selenium-webdriver');
-        let trevoga_00 = await require('./user_modules/function/trevoga_00.js');
-        const yarmarkaPoisk = await require("./user_modules/yarmarkaPoisk.js");
-        const vhod_proxy = await require("./user_modules/vhod_proxy.js");
-
-        //let driver = await vhod_proxy.vhodWithZip(numberInKatalog);
-        let massivForReturn = await vhod_proxy.vhodWithZip(numberInKatalog);
-        let driver = massivForReturn[0];
-        //let originalWindow = massivForReturn[1];
-
-        await trevoga_00.sleep(5000);
-        await driver.get('https://2ip.ru/');
-        await trevoga_00.sleep(5000);
+    const { Builder, By, Key, until } = require('selenium-webdriver');
+    let trevoga_00 = await require('./user_modules/function/trevoga_00.js');
+    const withoptions = await require("./user_modules/withoptions.js");
+    const pinterestPerepost = await require("./user_modules/pinterestPerepost.js");
+    massivForReturn = await withoptions.withoptions(numberInKatalog);
+    driver = massivForReturn[0];
+    originalWindow = massivForReturn[1];
+    
 
 
-        let findElements_massiv = await driver.findElements(By.css("[id=\"main-message\"] h1")); //проверяем есть ли подключение к Интернету
-        if (!findElements_massiv.length) {
-            await yarmarkaPoisk.yarmarkaPoisk(driver);
-            await trevoga_00.sleep(5000);
-            return driver;
+    let findElements_massiv = await driver.findElements(By.css("[id=\"main-message\"] h1")); //проверяем есть ли подключение к Интернету
+    if (!findElements_massiv.length) {
+   
+    let email_pin = massivForReturn[2];
+    let parole_pin = massivForReturn[3];
+    await withoptions.pin_vhod(driver, email_pin, parole_pin);
+    await pinterestPerepost.pinterestPerepost(driver, numberInKatalog);
+    return massivForReturn;
 
-        } else {
-            console.log('Нет подключения к Интернету')
-            return driver;
-        }
-
-        //await pinterestYarmarka01.nakrutkaYarmarka(driver, jMin, jMax, 'C:/copy/node/pinterest/files/katalog/2/6.csv');
-
-    } catch (error) { console.log(error) }
+    } else {
+        console.log('Нет подключения к Интернету')
+        return massivForReturn;
+    }
+    
 }
 module.exports.pinterestPerepost = pinterestPerepost;
 
+/*
+ try {
+    } catch (error) { console.log(error) }
 
-//это сценарий накрутки на Ярмарку через Пинтерест и ВКонтакте
-
-async function nakrutkaYarmarkaWithPinterest(numberInKatalog, jMin, jMax, numberAccauntForpublic, papkaForpublic) {
-    //try {
-        const path = require('path');
-        const { Builder, By, Key, until } = require('selenium-webdriver');
-        let trevoga_00 = await require('./user_modules/function/trevoga_00.js');
-        const pinterestYarmarka01 = await require("./user_modules/pinterestYarmarka01.js");
-        const vhod_proxy = await require("./user_modules/vhod_proxy.js");
-
-        let massivForReturn = await vhod_proxy.vhodWithZip(numberInKatalog);
-        driver = massivForReturn[0];
-        originalWindow = massivForReturn[1];
-        await trevoga_00.sleep(5000);
-        await driver.get('https://2ip.ru/');
-        await trevoga_00.sleep(5000);
-
-        let findElements_massiv = await driver.findElements(By.css("[id=\"main-message\"] h1")); //проверяем есть ли подключение к Интернету
-        if (!findElements_massiv.length) {
-            //let originalWindow = await driver.getWindowHandle();
-            //let newWindows,temp_02;
-            let parrentAdress = path.join(__dirname.replace("\\yarmarka\\scenarii", '').replace("/yarmarka/scenarii", ''));
-            driver = await pinterestYarmarka01.nakrutkaYarmarka(driver, jMin, jMax, `${parrentAdress}/pinterest/files/katalog/${papkaForpublic}/${numberAccauntForpublic}.csv`, numberAccauntForpublic);
-            await trevoga_00.sleep(5000);
-            /*let newWindows = await driver.getAllWindowHandles();
-            let countHandle = await newWindows.length;
-            await trevoga_00.sleep(5000);
-            //console.log(newWindows.length);
-            let handle;
-            for (let i = 1; i < countHandle; i++) {
-                handle = await newWindows[i - 1];
-                await driver.switchTo().window(handle);                
-                await driver.close();
-            }
-            newWindows = await driver.getAllWindowHandles();
-            handle = await newWindows[0];
-            await driver.switchTo().window(handle)
-            await trevoga_00.sleep(5000);*/
-            //return driver;
-            massivForReturn = [driver, originalWindow];
-            return massivForReturn;
-        } else {
-            console.log('Нет подключения к Интернету')
-            return driver;
-        }
-
-        //await pinterestYarmarka01.nakrutkaYarmarka(driver, jMin, jMax, 'C:/copy/node/pinterest/files/katalog/2/6.csv');
-
- //   } catch (error) { console.log(error) }
-}
-module.exports.nakrutkaYarmarkaWithPinterest = nakrutkaYarmarkaWithPinterest;
+*/

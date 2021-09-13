@@ -1,3 +1,36 @@
+async function pinterestPerepost(driver, numberInKatalog) {
+
+    const fs = require("fs");
+    const { Builder, By, Key, until } = require('selenium-webdriver');
+    const trevoga_00 = require("./function/trevoga_00.js");
+    const path = require("path");
+
+    let fileName_json = '../files/json/' + numberInKatalog + '.json';
+    let files_text = fs.readFileSync(fileName_json, 'utf8');
+    files_text = JSON.parse(files_text); //вывели и рапарсили объект свойств аккаунта
+    let friends_main = files_text.friends_main[0]; //зафиксирововали номер аккаунта-друга куда будем заходить и перепощивать Пины
+    let status = files_text.status //фиксируем глубину перепоста, чтобы знать откуда брать и куда сохранять
+
+    let fileName_jsonFriend = '../files/json/' + friends_main + '.json';
+    let files_textFriend = fs.readFileSync(fileName_jsonFriend, 'utf8');
+    files_textFriend = JSON.parse(files_textFriend); //вывели и рапарсили объект свойств Друга
+    let url_00Friend = files_textFriend.url_00 //фиксируем адрес рабочей страницы Друга
+    await driver.get(url_00Friend);
+    await trevoga_00.sleep(5000);
+    let findElements_massiv = await driver.findElements(By.css("[data-test-id = user-follow-button] button div")); //проверяем есть div предложением ПОДПИСАТЬСЯ
+
+    if (!!findElements_massiv.length) {
+        let textTemp = await findElements_massiv[0].getText();
+        textTemp = await textTemp.replace(/\s/g, '');
+        if (textTemp == 'Подписаться') {            
+                await findElements_massiv[0].click();
+                await trevoga_00.sleep(5000);
+        }
+    }
+
+}
+module.exports.pinterestPerepost = pinterestPerepost;
+
 
 //ф-ция захода на Пинтерест, на Пинтересте подгружаем ПИН с сылкой на Ярмарку, по ней идем на Ярмарку.
 
