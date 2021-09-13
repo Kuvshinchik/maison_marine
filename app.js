@@ -13,7 +13,7 @@ let numberAccauntForpublic = massivParametrCikl[2]; //этот параметр 
 let papkaForpublic = massivParametrCikl[3];
 let variantApp = +massivParametrCikl[4];
 
-async function YarmarkaPoisk(start, end) {
+async function pinterestPerepost(start, end) {
   let trevoga_00 = require('./scenarii/user_modules/function/trevoga_00.js');
   //let adressIpPort = 'C:/copy/node/files/ipPort/00/00.csv';
   //let massivIpPort = fs.readFileSync(adressIpPort, 'utf8').trim().split('\n');
@@ -22,7 +22,7 @@ async function YarmarkaPoisk(start, end) {
   for (let i = start; i <= end; i++) {
     console.log(i);
     const scenarii_00 = await require('./scenarii/scenarii_00.js');
-    driver = await scenarii_00.YarmarkaWithPoisk(i);
+    driver = await scenarii_00.pinterestPerepost(i);
 
 
     if (i != end) {
@@ -127,7 +127,7 @@ async function YarmarkaPinterest(start, end, numberAccauntForpublic, papkaForpub
 
 switch (variantApp) {
   case 1:
-    YarmarkaPoisk(start, end);
+    pinterestPerepost(start, end);
     break;
   case 2:
     YarmarkaPinterest(start, end, numberAccauntForpublic, papkaForpublic);

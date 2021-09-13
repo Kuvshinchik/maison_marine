@@ -19,8 +19,7 @@ const trevoga_00 = require("./function/trevoga_00");
 const options = new chrome.Options();
 let adressParent = __dirname.replace("\\pinterest\\scenarii\\user_modules", '').replace("/pinterest/scenarii/user_modules", '');
 let adressZiip = path.join(adressParent, `/files/ipPort/${numberInKatalog}/proxy_auth.zip`);
-const userProfilePath = path.join(adressParent,`/Browsers_chrome/Browser_chrome_${numberInKatalog}/Default`);
-console.log(userProfilePath);
+const userProfilePath = path.join(adressParent, `/Browsers_chrome/Browser_chrome_${numberInKatalog}/Default`);
 //const userProfilePath = 'C:/copy/node/Browsers_chrome/Browser_chrome_' + numberInKatalog +'/Default';
 const { PageLoadStrategy } = require("selenium-webdriver/lib/capabilities");
 
@@ -29,15 +28,15 @@ options.setPageLoadStrategy(PageLoadStrategy.NONE); //РАБОТАЕТ!!!!
 //options.setChromeOptions();
 options.addArguments(`useAutomationExtension=False`, `disable-blink-features=AutomationControlled`, `window-size=850,1500`, `window-position=10,10`);
 options.addArguments(`user-data-dir=${userProfilePath}`, `profile-directory=Profile 1`);
+
 function encode(file) {
     var stream = fs.readFileSync(file);
     return new Buffer.from(stream).toString('base64');
 }
+
 options.addExtensions(encode(adressZiip));
 let parrentAdress = path.join(__dirname.replace("\\pinterest\\scenarii\\user_modules", '').replace("/pinterest/scenarii/user_modules", ''));
-//let parrentAdress = 'C:/copy/node/files/webrtc-control-master.zip';
 options.addExtensions(encode(`${parrentAdress}/files/webrtc-control-master.zip`));
-//options.addExtensions(encode(parrentAdress));
 
 /**/
 (async function example() {
@@ -47,11 +46,12 @@ options.addExtensions(encode(`${parrentAdress}/files/webrtc-control-master.zip`)
         .build();
 
     await trevoga_00.clickLocationNone(driver);
-    await trevoga_00.sleep(15000);
-    /*await driver.get('https://browserleaks.com/geo');
-    await trevoga_00.sleep(5000);*/
+    await trevoga_00.sleep(2000);
+    await driver.get('https://browserleaks.com/geo');
+    await trevoga_00.sleep(5000);
     await driver.get('https://www.pinterest.com');
 
+    
     //await driver.quit();
 })();
 

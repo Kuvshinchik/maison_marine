@@ -1,6 +1,6 @@
 //это сценарий поиска на Ярмарке через ключевые слова
 
-async function YarmarkaWithPoisk(numberInKatalog) {
+async function pinterestPerepost(numberInKatalog) {
     try {
 
         const { Builder, By, Key, until } = require('selenium-webdriver');
@@ -33,7 +33,7 @@ async function YarmarkaWithPoisk(numberInKatalog) {
 
     } catch (error) { console.log(error) }
 }
-module.exports.YarmarkaWithPoisk = YarmarkaWithPoisk;
+module.exports.pinterestPerepost = pinterestPerepost;
 
 
 //это сценарий накрутки на Ярмарку через Пинтерест и ВКонтакте
