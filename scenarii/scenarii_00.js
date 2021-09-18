@@ -15,10 +15,10 @@ async function pinterestPerepost(numberInKatalog) {
     let findElements_massiv = await driver.findElements(By.css("[id=\"main-message\"] h1")); //проверяем есть ли подключение к Интернету
     if (!findElements_massiv.length) {
    
-    let email_pin = massivForReturn[2];
-    let parole_pin = massivForReturn[3];
-    await withoptions.pin_vhod(driver, email_pin, parole_pin);
-    await pinterestPerepost.pinterestPerepost(driver, numberInKatalog);
+    //let email_pin = massivForReturn[2];
+    //let parole_pin = massivForReturn[3];
+    //await withoptions.pin_vhod(driver, email_pin, parole_pin);
+    await pinterestPerepost.pinterestPerepost(driver, numberInKatalog, massivForReturn);
     return massivForReturn;
 
     } else {

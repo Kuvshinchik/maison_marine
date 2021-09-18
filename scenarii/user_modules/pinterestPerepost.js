@@ -1,246 +1,120 @@
-async function pinterestPerepost(driver, numberInKatalog) {
-
+async function pinterestPerepost(driver, numberInKatalog, massivForReturn) {
+    const withoptions = await require("./withoptions.js");
     const fs = require("fs");
     const { Builder, By, Key, until } = require('selenium-webdriver');
     const trevoga_00 = require("./function/trevoga_00.js");
     const path = require("path");
+    let countSaveElement = 0;
 
     let fileName_json = '../files/json/' + numberInKatalog + '.json';
     let files_text = fs.readFileSync(fileName_json, 'utf8');
     files_text = JSON.parse(files_text); //вывели и рапарсили объект свойств аккаунта
     let friends_main = files_text.friends_main[0]; //зафиксирововали номер аккаунта-друга куда будем заходить и перепощивать Пины
-    let status = files_text.status //фиксируем глубину перепоста, чтобы знать откуда брать и куда сохранять
-
+    let status = files_text.status //фиксируем глубину перепоста, чтобы знать куда сохранять
+    let name_doska = files_text.massiv_name_doska[status] //фиксируем название доски куда будем сохранять
     let fileName_jsonFriend = '../files/json/' + friends_main + '.json';
     let files_textFriend = fs.readFileSync(fileName_jsonFriend, 'utf8');
     files_textFriend = JSON.parse(files_textFriend); //вывели и рапарсили объект свойств Друга
-    let url_00Friend = files_textFriend.url_00 //фиксируем адрес рабочей страницы Друга
-    await driver.get(url_00Friend);
-    await trevoga_00.sleep(5000);
-    let findElements_massiv = await driver.findElements(By.css("[data-test-id = user-follow-button] button div")); //проверяем есть div предложением ПОДПИСАТЬСЯ
 
-    if (!!findElements_massiv.length) {
-        let textTemp = await findElements_massiv[0].getText();
-        textTemp = await textTemp.replace(/\s/g, '');
-        if (textTemp == 'Подписаться') {            
+
+    if (files_textFriend.public_count[0] > files_text.public_count[0]) {  //если есть разница в репостах, то начинаем репостить; счетчик репостов первый элемент соответствующего массива в файле JSON аккаунта
+        let countCiklSave = files_textFriend.public_count[0] - files_text.public_count[0];
+        let email_pin = massivForReturn[2];
+        let parole_pin = massivForReturn[3];
+        await withoptions.pin_vhod(driver, email_pin, parole_pin);
+        await trevoga_00.sleep(5000);
+        let url_00Friend = files_textFriend.url_00 //фиксируем адрес рабочей страницы Друга
+        let statusFriend = files_textFriend.status //фиксируем статус друга, чтобы знать откуда брать
+        let name_doskaFriend = files_textFriend.massiv_name_doska[statusFriend] //фиксируем название доски откуда будем брать
+        let urlDoskaFriend = `${url_00Friend}${name_doskaFriend}/`;
+        await driver.get(url_00Friend);
+        await trevoga_00.sleep(5000);
+        let findElements_massiv = await driver.findElements(By.css("[data-test-id = user-follow-button] button div")); //проверяем есть div предложением ПОДПИСАТЬСЯ
+        let textTemp;
+        if (!!findElements_massiv.length) {
+            textTemp = await findElements_massiv[0].getText();
+            textTemp = await textTemp.replace(/\s/g, '');
+            if (textTemp == 'Подписаться') {
                 await findElements_massiv[0].click();
                 await trevoga_00.sleep(5000);
+            }
         }
-    }
 
+        console.log(`есть разница`)
+        await driver.get(urlDoskaFriend); //заходим на Доску Друга, чтобы отрепоститься
+        await trevoga_00.sleep(5000);
+        findElements_massiv = await driver.findElements(By.css("[data-test-id = LegoBoardHeader__main] h1")); //проверяем есть или нет заголовок доски
+        if (!!findElements_massiv.length) {
+            textTemp = await findElements_massiv[0].getText();
+            textTemp = await textTemp.replace(/\s/g, '');
+            if (textTemp == name_doskaFriend) {   //если название Доски то, начинаем репоститься
+                //console.log(`${await driver.getCurrentUrl()}`)
+
+
+
+
+                for (let j = 0; j < countCiklSave; j++) {
+
+                    findElements_massiv = await driver.findElements(By.css("[data-test-id = non-story-pin-image] img")); //проверяем есть или нет Пины
+                    if (!!findElements_massiv.length) {
+
+                        
+                        //наводим мышь на ПИН
+                        await trevoga_00.sleep(7000);
+                        await driver.actions({ bridge: true })
+                            .move({ origin: findElements_massiv[j] })
+                            .pause(2000)
+                            .release()
+                            .perform();
+                        await trevoga_00.sleep(5000);
+
+                        findElements_massiv = await driver.findElements(By.css("[data-test-id = PinBetterSaveDropdown] div")); //после наведения мышки активируются дополнительные элементы, берем название активируемой доски для сохранения
+                        if (!!findElements_massiv.length) {
+                            textTemp = await findElements_massiv[0].getText();
+                            textTemp = await textTemp.replace(/\s/g, '');
+                            if (textTemp == name_doska) {   //если название Доски то которое нам необходимо, начинаем сохранять
+                                findElements_massiv = await driver.findElements(By.css("[data-test-id = PinBetterSaveButton] div")); //после наведения мышки активируются дополнительные элементы, берем текст кнопки СОХРАНИТЬ
+                                textTemp = await findElements_massiv[0].getText();
+                                textTemp = await textTemp.replace(/\s/g, '');
+                                if (textTemp == 'Сохранить') {
+                                    await findElements_massiv[0].click(); //жмем кнопку сохранить
+                                    await trevoga_00.sleep(3000);
+                                    countSaveElement++
+                                } else { console.log(`Кнопка сохранить не содержит текст СОХРАНИТЬ`) }
+                            } else {
+                                findElements_massiv = await driver.findElements(By.css("[data-test-id = boardSelectionDropdown]")); //если название ДОСКИ не совпадает, активируем выпадающее меню
+                                if (!!findElements_massiv.length) {
+                                    await findElements_massiv[0].click(); //жмем и тем самым активируем выпадающее меню
+                                    await trevoga_00.sleep(3000);
+                                    findElements_massiv = await driver.findElements(By.css("[data-test-id = boardWithoutSection]")); //в выпадающем меню забираем элементы с названием ДОСОК
+                                    if (!!findElements_massiv.length) {
+                                        let countNameBoard = findElements_massiv.length //кол-во этих элементов, создаем цикл и ищем элемент с нужной ДОСКОЙ
+                                        for (let i = 0; i < countNameBoard; i++) {
+                                            textTemp = await findElements_massiv[i].getText();
+                                            textTemp = await textTemp.replace(/\s/g, '');
+                                            if (textTemp == name_doska) {
+                                                let tempElement = await driver.findElements(By.css(`[data-test-id = boardWithoutSection] [title=${name_doska}]`)); //если название ДОСКИ совпадет то забираем этот элемент
+                                                await tempElement[0].click();  //и кликаем на него
+                                                await trevoga_00.sleep(3000);
+                                                countSaveElement++
+                                                break; //и выходим из цикла
+                                            }
+                                        }
+                                    } else { console.log(`Не вижу названия ДОСОК`) }
+                                } else { console.log(`Не нашел выпадающее меню с названием ДОСОК`) }
+                            }
+                        } else { console.log(`Не активировались дополнительные опции, не вижу название Доски для сохранения`) }
+                    } else { console.log(`Здесь нет Пинов`) }
+                }
+                files_text.public_count[0] = countCiklSave + files_text.public_count[0];
+                console.log(files_text.public_count[0]);
+
+
+            } else { console.log(`Зашли не туда, нужно в ${name_doskaFriend}, а попали в ${await driver.getCurrentUrl()}`) }
+        } else { console.log(`Нет заголовка запрашиваемой доски ${name_doskaFriend}`) }
+    } else { console.log(`Нет разницы в репостах, поэтому вышел из скрипта`) }
 }
 module.exports.pinterestPerepost = pinterestPerepost;
 
 
-//ф-ция захода на Пинтерест, на Пинтересте подгружаем ПИН с сылкой на Ярмарку, по ней идем на Ярмарку.
-
-async function nakrutkaYarmarka(driver, jMin, jMax, adressPinNakrutka, numberAccauntForpublic) {
-
-    const fs = require("fs");
-    const { Builder, By, Key, until } = require('selenium-webdriver');
-    const trevoga_00 = require("./function/trevoga_00.js");
-
-    let newWindows, temp_02, findElements_massiv, massivIpPort, adressPinVk;
-
-    /* findElements_massiv = await driver.findElements(By.css("h1")); //проверяем есть ли подключение к Интернету
-    if (!!findElements_massiv.length) {
-        let textTemp = await findElements_massiv[0].getText();
-
-        if ((await textTemp.indexOf('Нет подключения к Интернету')) > -1) {
-            console.log(await textTemp.indexOf('Нет подключения к Интернету'));
-            console.log(1111);
-            
-            return;
-        }
-    }
- */
-
-    //try {
-    //цикл просмотра ПИНов, как правило jMin= jMax, поэтому просматриваем с одного IP один ПИН, но можно изменять параметры
-    for (let j = jMin; j <= jMax; j++) {
-        massivIpPort = fs.readFileSync(adressPinNakrutka, 'utf8').trim().split('\n');
-
-        adressPinVk = massivIpPort[j]
-        await driver.get(adressPinVk);
-        originalWindow = await driver.getWindowHandle();
-        await trevoga_00.sleep(5000);
-        findElements_massiv = await driver.findElements(By.css("body")); //чтобы протянуть страницу нужно вызвать локатор body
-        await trevoga_00.sleep(1000);
-
-        if (!!findElements_massiv.length) {
-            await findElements_massiv[0].sendKeys('', Key.END); //протягиваем вниз страницу
-            await trevoga_00.sleep(5000);
-            await findElements_massiv[0].sendKeys('', Key.HOME); //протягиваем вверх страницу
-            await trevoga_00.sleep(5000);
-            //Чтобы появилась вся картинка сначала протягиваем ее вниз потом обратно вверх
-        } else {
-            // await trevoga_00.trevoga(driver);
-            console.log('Споткнулись на БОДИ')
-        }
-
-        findElements_massiv = await driver.findElements(By.css("[data-test-id=\"pin-closeup-image\"]")); //это селектор ПИНа, т.е. в принципе страница с ПИНом появилась или нет
-        if (!!findElements_massiv.length) {
-            //findElements_massiv = await driver.findElements(By.css("[data-test-id=\"pin-attribution\"] a")); //на ПИНе справа ссылка на хозяина ПИНа, в принципе есть эта ссылка или нет
-            findElements_massiv = await driver.findElements(By.css("[data-test-id=\"pin-attribution\"]")); //поменяли селектор 2021_06_25
-            if (!!findElements_massiv.length) {
-                let hrefJury = await findElements_massiv[0].getAttribute('href'); //забираем эту ссылку и сравниваем его, если не мой то проваливаемся
-
-
-                let number_accaunt = numberAccauntForpublic; //номер аккаунта  
-                let fileName_json = '../files/json/' + number_accaunt + '.json';
-                let files_text = fs.readFileSync(fileName_json, 'utf8');
-                files_text = JSON.parse(files_text);
-                let hrefJuryTemp = hrefJury.replace('com', 'ru');
-                let urlTemp = files_text.url_00.replace('com', 'ru');
-                if ((hrefJuryTemp == 'https://www.pinterest.ru/juryi_001/') || (hrefJuryTemp == urlTemp)) {
-
-
-                    //Это костыль НАДО ИСПРАВИТЬ, для проверки изменили переменную findElements_massiv, возвращаем нужный параметр
-                    await trevoga_00.sleep(2000);
-                    findElements_massiv = await driver.findElements(By.css("[data-test-id=\"pin-closeup-image\"]")); //это селектор ПИНа, который брали выше потом потеряли теперь восстанавлмваем, чтобы на него навести мышь
-                    await trevoga_00.sleep(5000);
-                    //Это костыль НАДО ИСПРАВИТЬ
-
-                    //window.scrollBy(0, 50);
-
-                    //наводим мышь на ПИН, не перепроверяем, потому что уже проверяли выше
-                    await driver.actions({ bridge: true })
-                        .move({ origin: findElements_massiv[0] })
-                        .pause(2000)
-                        .release()
-                        .perform();
-                    await trevoga_00.sleep(5000);
-                    findElements_massiv = await driver.findElements(By.css(".imageDomainLinkHover a"));  //после наведения мыши появляется этот селектор со ссылкой на магазин Ярмарки
-                    if (!!findElements_massiv.length) {
-                        hrefJury = await findElements_massiv[0].getAttribute('href'); //забираем ссылку и смотрим есть ли там ссылка на Ярмарку, если нет то проваливаемся
-                        if ((hrefJuryTemp.indexOf('livemaster')) == -1) {
-                            await driver.actions({ bridge: true })
-                                .move({ origin: findElements_massiv[0] })
-                                .pause(1000)
-                                .release()
-                                .perform();
-                            //После прокрутки туда сюда элемент появляется в полный рост, поэтому ссылка на Ярмарку внизу и не видна, когда прокручиваем к ней Пинтерест выкидывает модальное окно и тем самым ломает DOM, поэтому еще раз определяем локатор ссылки, а потом кликаем элемент                                   
-                            await trevoga_00.sleep(1000);
-                            findElements_massiv = await driver.findElements(By.css(".imageDomainLinkHover a"));  //после наведения мыши появляется этот селектор 
-                            await trevoga_00.sleep(1000);
-                            await driver.actions({ bridge: true })
-                                .move({ origin: findElements_massiv[0] })
-                                .pause(1000)
-                                .click(findElements_massiv[0])  //жму кнопку активируя ссылку перехода на ярмарку
-                                .release()
-                                .perform();
-
-                            await trevoga_00.sleep(5000);
-                            (await driver).close();
-                            await trevoga_00.sleep(2000);
-                            newWindows = await driver.getAllWindowHandles();
-                            await newWindows.forEach(handle => { if (handle !== originalWindow) { temp_02 = handle } });
-
-                            if (!!temp_02) {
-                                await driver.switchTo().window(temp_02); //переходим во второе окно, где загрузилась ЯРМАРКА 
-                            } else { console.log('Проблема со вторым окном, которое должно было открыться с переходом на ЯРМАРКУ') };
-                            await trevoga_00.sleep(5000);
-
-                            /*
-                         //Это раздел работы с БОНУСНЫМ окном =============================================
-                         findElements_massiv = await driver.findElements(By.css(".loyalty-coupon")); //проверяем выскочила форма бонуса или нет
-                         if (!!findElements_massiv.length) {
-                             //console.log('выскочила форма БОНУСА');
-                             findElements_massiv = await driver.findElements(By.css("span.loyalty-coupon__close"));
-                             if (!!findElements_massiv.length) {
-                                 //console.log('ЗАКРЫВАЕМ форму БОНУСА');
-                                 await findElements_massiv[0].click();
-                             }
-                         } else { console.log('Не было БОНУСНОГО ОКНА') };
-                         //Это раздел работы с БОНУСНЫМ окном ================================================
-
-
-                      
-                         Это блок рекламы, которая выезжала справа внизу, сейчас ее нет, поэтому закомментировал
-                                                         await trevoga_00.sleep(5000);
-                                                         findElements_massiv = await driver.findElements(By.css(".close-btn.js-close-btn")); //проверяем выскочила реклама или нет
-                         
-                                                         if (!!findElements_massiv.length) {
-                                                             //console.log('ЗАКРЫВАЕМ рекламу');
-                                                             await findElements_massiv[0].click();
-                         
-                                                         }
-                         
-                         */
-
-
-                            //findElements_massiv = await driver.findElements(By.css("[data-event=\"desktopFilterSection\"] a"));  //на странице магазина Ярмарки это массив карточек категорий
-                            //await trevoga_00.sleep(5000);
-                            // if (!!findElements_massiv.length) {
-                            /*let randomTovarMax = await findElements_massiv.length - 1;
-                            let randomTovar = await trevoga_00.randomInteger(0, randomTovarMax)
-                            //  рандомно генерируем номер отображенных категорий на Ярмарке, чтобы перейти по нему 
-                            let postYarmarka = await findElements_massiv[randomTovar];
-                            await postYarmarka.click();
-                            await trevoga_00.sleep(5000);*/
-
-
-
-                            let countBrod = await trevoga_00.randomInteger(1, 5);
-                            for (let brod = 1; brod <= countBrod; brod++) {
-                                await trevoga_00.sleep(5000);
-                                findElements_massiv = await driver.findElements(By.css("a.item-preview__image-container")); //после того как зашли в категория, проверяем есть ли товары
-                                await trevoga_00.sleep(5000);
-                                if ((!!findElements_massiv.length) && (findElements_massiv[0].isDisplayed())) {
-                                    //console.log(1111111)
-                                    randomTovarMax = await findElements_massiv.length - 1;
-                                    randomTovar = await trevoga_00.randomInteger(0, randomTovarMax)
-                                    //  рандомно генерируем номер отображенных товаров на Ярмарке, чтобы перейти по нему 
-                                    let postYarmarka = await findElements_massiv[randomTovar];
-                                    await driver.executeScript("arguments[0].scrollIntoView()", postYarmarka); //протянули к элементу postYarmarka
-                                    await postYarmarka.click();
-                                    await trevoga_00.sleep(5000);
-                                } else { console.log('Из категорий зашли в товары, но товаров нет!!!!') };
-                            }
-                            //await driver.executeScript(`window.close()`);
-                            await trevoga_00.sleep(5000);
-
-                            /*
-                                                            //проверить этот абзац если не поможет УДАЛИТЬ
-                                                            newWindows = await driver.getAllWindowHandles();
-                                                            await newWindows.forEach(handle => { if (handle !== originalWindow) { temp_02 = handle } });
-                                                            //проверить этот абзац если не поможет УДАЛИТЬ
-                            
-                            
-                                                            if (!!temp_02) {
-                                                                await driver.switchTo().window(temp_02); //еще раз активируем второе окно, на случай ошибки прежде чем его закрыть
-                                                                (await driver).close();
-                                                                await trevoga_00.sleep(2000);
-                                                            } else { console.log('Проблема со вторым окном, которое где-то потерялось!') };
-                            
-                            
-                                                            await trevoga_00.sleep(2000);
-                           
-
-                            if (!!originalWindow) {
-                                await driver.switchTo().window(originalWindow);
-                            } else {
-                                await trevoga_00.sleep(5000);
-                                console.log('Не нашел оригинальную вкладку, обратить внимание - сколько вкладок открыто!')
-                            };
-
-                            findElements_massiv = await driver.findElements(By.css("[data-test-id=\"full-page-signup-close-button\"] button"));  // ПРИ протягивании это форма вылезает с предложением войти или зарегистрироваться
-                            await trevoga_00.sleep(1000);
-                            if (!!findElements_massiv.length) {
-                                postYarmarka = await findElements_massiv[0];
-                                await postYarmarka.click();
-                                console.log('выскочила форма SIGN, мы ее кликнули');
-                            } */
-                            //} else { console.log('либо не перешел во вторую вкладку, либо Ярмарка чудит') }
-
-                        } else { console.log('Пинтерест заменил ссылку, ссылка не моя') }
-                    } else { console.log('навел мышь на Пин, но не обнаружил кнопку со ссылкой перехода на Ярмарку') }
-                } else { console.log(hrefJury + ' - это левый Пин'); }
-            } else { console.log('нет ссылки на Юрия Кувшинова') }
-        } else { console.log('нет запрашиваемого Пина') }
-    }
-    return driver;
-    // } catch (error) { console.log(error) }
-};
-module.exports.nakrutkaYarmarka = nakrutkaYarmarka;
 
