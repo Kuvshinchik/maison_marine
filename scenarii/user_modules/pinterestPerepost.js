@@ -22,14 +22,20 @@ async function pinterestPerepost(driver, numberInKatalog, massivForReturn) {
         let email_pin = massivForReturn[2];
         let parole_pin = massivForReturn[3];
         await withoptions.pin_vhod(driver, email_pin, parole_pin);
-        await trevoga_00.sleep(5000);
+        await trevoga_00.sleep(15000);
         let url_00Friend = files_textFriend.url_00 //фиксируем адрес рабочей страницы Друга
         let statusFriend = files_textFriend.status //фиксируем статус друга, чтобы знать откуда брать
         let name_doskaFriend = files_textFriend.massiv_name_doska[statusFriend] //фиксируем название доски откуда будем брать
         let urlDoskaFriend = `${url_00Friend}${name_doskaFriend}/`;
         await driver.get(url_00Friend);
-        await trevoga_00.sleep(5000);
-        let findElements_massiv = await driver.findElements(By.css("[data-test-id = user-follow-button] button div")); //проверяем есть div предложением ПОДПИСАТЬСЯ
+        //await driver.manage().timeouts().implicitlyWait(30000);
+        await driver.manage().setTimeouts( { implicit: 30000 } );
+
+        let findElements_massiv = await driver.findElements(By.css("[data-test-id = profile-header]")); //ждем загрузку
+        //await driver.manage().timeouts().implicitlyWait(0);
+        await driver.manage().setTimeouts( { implicit: 0 } );
+
+        findElements_massiv = await driver.findElements(By.css("[data-test-id = user-follow-button] button div")); //проверяем есть div предложением ПОДПИСАТЬСЯ
         let textTemp;
         if (!!findElements_massiv.length) {
             textTemp = await findElements_massiv[0].getText();
@@ -42,8 +48,11 @@ async function pinterestPerepost(driver, numberInKatalog, massivForReturn) {
 
         console.log(`есть разница`)
         await driver.get(urlDoskaFriend); //заходим на Доску Друга, чтобы отрепоститься
-        await trevoga_00.sleep(5000);
+        //await driver.manage().timeouts().implicitlyWait(30000);
+        await driver.manage().setTimeouts( { implicit: 30000 } );
         findElements_massiv = await driver.findElements(By.css("[data-test-id = LegoBoardHeader__main] h1")); //проверяем есть или нет заголовок доски
+        //await driver.manage().timeouts().implicitlyWait(0);
+        await driver.manage().setTimeouts( { implicit: 0 } );
         if (!!findElements_massiv.length) {
             textTemp = await findElements_massiv[0].getText();
             textTemp = await textTemp.replace(/\s/g, '');
@@ -54,11 +63,13 @@ async function pinterestPerepost(driver, numberInKatalog, massivForReturn) {
 
 
                 for (let j = 0; j < countCiklSave; j++) {
-
+                    await driver.manage().setTimeouts( { implicit: 30000 } );
                     findElements_massiv = await driver.findElements(By.css("[data-test-id = non-story-pin-image] img")); //проверяем есть или нет Пины
+                    await driver.manage().setTimeouts( { implicit: 0 } );
+                    
                     if (!!findElements_massiv.length) {
 
-                        
+
                         //наводим мышь на ПИН
                         await trevoga_00.sleep(7000);
                         await driver.actions({ bridge: true })

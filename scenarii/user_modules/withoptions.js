@@ -44,9 +44,9 @@ async function withoptions(numberInKatalog) {
         .setChromeOptions(options)
         .build();
 
-    await trevoga_00.sleep(2000);
-    originalWindow = await driver.getWindowHandle();
 
+    originalWindow = await driver.getWindowHandle();
+    await trevoga_00.sleep(2000);
     await trevoga_00.clickLocationNone(driver);
     await trevoga_00.sleep(2000);
     await driver.get('https://browserleaks.com/geo');
@@ -67,8 +67,9 @@ async function pin_vhod(driver, email_pin, parole_pin) {
     const trevoga_00 = require("./function/trevoga_00");
     const { Builder, By, Key, until } = require('selenium-webdriver');
     await driver.get('https://www.pinterest.ru/');
-    let random_seconds = trevoga_00.randomInteger(5, 6) * 1000;
-    trevoga_00.sleep(random_seconds);
+    await trevoga_00.sleep(5000);
+    //let random_seconds = trevoga_00.randomInteger(5, 6) * 1000;
+    //trevoga_00.sleep(random_seconds);
     let findElements_massiv = await driver.findElements(By.css("[data-test-id='simple-login-button'] button"));
     if (!!findElements_massiv.length) {
         random_seconds = trevoga_00.randomInteger(3, 4) * 1000;

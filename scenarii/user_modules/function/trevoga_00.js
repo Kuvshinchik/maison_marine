@@ -140,7 +140,20 @@ async function clickLocationNone(driver) {
         .press()
         .release()
         .perform();
-    sleep(2000);
+    sleep(3000);
+
+await driver.navigate().to("chrome://settings/content/idleDetection");
+    sleep(3000);
+    await driver.actions({ bridge: true })
+        //.move({ x: 979, y: 159 })
+        .move({ x: 500, y: 330 })
+        .pause(1000)
+        .press()
+        .release()
+        .perform();
+    sleep(3000);
+
+
 };
 module.exports.clickLocationNone = clickLocationNone;
 
