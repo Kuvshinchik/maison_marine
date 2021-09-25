@@ -12,6 +12,7 @@ git commit -m "Version 1.0"
 git push origin 
 
 Kuvshinchik
+ѕароль - Kuvshinchik_013
 
 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
 
